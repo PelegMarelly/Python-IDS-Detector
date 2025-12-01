@@ -1,6 +1,18 @@
-# Python IDS Detector
+# Multi-Layer Host-Based IDS (HIDS)
 
-A network Intrusion Detection System (IDS) written in Python that detects TCP SYN port scans in real-time and alerts the user via a GUI pop-up.
+A Python-based Intrusion Detection System designed to monitor network traffic in real-time and detect anomalous behavior indicative of a compromised host.
+
+The system analyzes traffic at **Layer 2 (Data Link)** and **Layer 4 (Transport)** to identify various reconnaissance techniques used by malware and threat actors during the post-exploitation phase (e.g., Lateral Movement).
+
+## Key Features
+
+* **Real-Time Sniffing:** Uses `Scapy` to capture and analyze packets on the fly.
+* **SYN Scan Detection:** Identifies rapid TCP connection attempts to multiple ports.
+* **ARP Scan Detection:** Detects local network discovery attempts (Layer 2 reconnaissance).
+* **Stealth Scan Detection:** Identifies malformed packets used to bypass firewalls:
+    * **NULL Scans** (No flags set).
+    * **XMAS Scans** (FIN, PSH, URG flags set).
+* **GUI Alert System:** Provides immediate visual feedback upon threat detection.
 
 ## Getting Started
 
@@ -22,7 +34,7 @@ A network Intrusion Detection System (IDS) written in Python that detects TCP SY
 
 To demonstrate the system's capabilities, you will need two separate terminal instances: one to run the defense mechanism (IDS) and one to simulate the attack.
 
-### 1. Deploy the Detector
+### 1. Deploy the Detector (The Defense)
 
 The detection script requires access to the network interface, which mandates administrative privileges.
 
@@ -31,23 +43,28 @@ The detection script requires access to the network interface, which mandates ad
     ```bash
     python scan_detector.py
     ```
-3.  The system will initialize and begin monitoring network traffic for TCP SYN packets.
+3.  The system will initialize and begin monitoring network traffic.
 
-### 2. Simulate a Port Scan
+### 2. Simulate Attacks (The Offense)
 
-The repository includes an `attacker.py` script designed to simulate a rapid port scan for testing purposes.
+The repository includes an `attacker.py` script designed to simulate a compromised host performing reconnaissance.
 
 1.  Open a **separate** terminal window.
-2.  Edit `attacker.py` and ensure the `target_ip` variable is set to your machine's **actual LAN IP address** (e.g., `192.168.1.15`).
-    > **Note:** Do not use `127.0.0.1` or `localhost`, as the packet sniffer may not capture loopback traffic depending on the OS configuration.
+2.  Edit `attacker.py` and ensure the `target_ip` variable is set to an **external IP address** (e.g., another device on your network like `192.168.1.50` or a public IP).
+    > **Technical Note:** We use an external IP to force traffic through the physical Network Interface Card (NIC), allowing the sniffer to capture outbound packets. Using `localhost` might cause the OS to route traffic via the Loopback interface, bypassing the sniffer.
 3.  Run the attack simulation:
     ```bash
     python attacker.py
     ```
+4.  **Select an Attack Vector:** The script will present a menu. Choose an option (1-4) to simulate different scan types (SYN, XMAS, NULL, or ARP).
 
 ### Expected Behavior
 
-Upon execution of the attack simulation, the IDS will detect the rapid succession of connection attempts.
+Upon executing an attack, the IDS will detect the pattern:
 
-* **Console Output:** The detector terminal will log the source IP and the number of unique ports scanned.
-* **GUI Alert:** A pop-up warning window will appear on the screen, notifying the user of the detected port scan activity.
+* **Console Output:** The detector terminal will log the threat type, source IP, and specific details (e.g., "XMAS Scan detected").
+* **GUI Alert:** A pop-up warning window will appear on the screen, notifying the user of the malicious activity.
+
+## Disclaimer
+
+This project is for educational purposes only. The `attacker.py` script should only be used on networks and devices you own or have explicit permission to test.
