@@ -64,7 +64,3 @@ Upon executing an attack, the IDS will detect the pattern:
 
 * **Console Output:** The detector terminal will log the threat type, source IP, and specific details (e.g., "XMAS Scan detected").
 * **GUI Alert:** A pop-up warning window will appear on the screen, notifying the user of the malicious activity.
-
-## Disclaimer
-
-This project is for educational purposes only. The `attacker.py` script should only be used on networks and devices you own or have explicit permission to test.
